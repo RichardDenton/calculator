@@ -1,0 +1,37 @@
+body {
+    background-color: #333;
+}
+
+button {
+    border: 2px solid;
+}
+
+#main {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#calculatorframe {
+    border: 5px solid;
+    border-radius: 5px;
+    width: 25vw;
+    height: 27vw;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 100px;
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+}
+
+#screen {
+    border: 2px solid;
+    background-color: #FFF;
+    grid-column: span 4;
+}
+
+.widebtn {
+    grid-column: span 2;
+}
+
+.function {
+    background-color: #777;
+}
