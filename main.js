@@ -5,6 +5,7 @@ for (let x=0; x < buttons.length; x ++) {
 }
 let decimalEnabled = true;
 let lastButtonWasOperator = false;
+let equalsPressed = false;
 
 const runningDisplay = document.getElementById('runningdisplay');
 let runningDisplayString = '0';
@@ -35,6 +36,8 @@ function buttonClick(e) {
             case 'equals':
                 updateRunningDisplay(this.id);
                 lastButtonWasOperator = false;
+                updateResult(evaluateEquation(convertEquationStringToArray(runningDisplayString)));
+                equalsPressed = true;
                 break;
             case 'divide':
             case 'multiply':
@@ -56,6 +59,15 @@ function enableDecimal() {
 }
 
 function updateResult(chars) {
+    if (equalsPressed === true) {
+        clear('all');
+        equalsPressed = false;
+    }
+    if (chars === 'Infinity' || chars === 'NaN') {
+        resultString = 'Divide by 0 error!';
+        result.textContent = resultString;
+        return;
+    }
     if (resultString === '0') {
         if (chars === '.') {
             resultString = '0' + chars;
@@ -69,9 +81,28 @@ function updateResult(chars) {
 }
 
 function updateRunningDisplay(operation) {
-    operators = {'plus': '+', 'minus': '-', 'equals':'='};
-    operators['divide'] = String.fromCharCode(247);
-    operators['multiply'] = String.fromCharCode(215);
+    operators = {'divide': '÷', 'multiply': '×', 'plus': '+', 'minus': '-', 'equals':'='};
+    if (resultString === 'Divide by 0 error!') {
+        clear('all');
+        equalsPressed = false;
+        return;
+    }
+    if (equalsPressed === true) {
+        let scientificNotation = false;
+        for (let x=0; x < resultString.length; x++) {
+            if (resultString[x] === 'e') {
+                scientificNotation = true;
+            }
+        }
+        if (scientificNotation === true) {
+            clear('all');   // Clears calculator when scientific notation is detected in previous result
+            equalsPressed = false;
+            return;
+        } else {
+            clear('runningDisplay'); // Clears only the running display if scientific notation isn't detected in previous result
+            equalsPressed = false;
+        }
+    }
     if(lastButtonWasOperator) {
         runningDisplayString = runningDisplayString.slice(0,-1) + operators[operation];
         runningDisplay.textContent = runningDisplayString;
@@ -85,7 +116,6 @@ function updateRunningDisplay(operation) {
     }
     runningDisplay.textContent = runningDisplayString;
     clear('result');
-
 }
 
 function clear(scope) {
@@ -99,6 +129,9 @@ function clear(scope) {
         resultString = '0';
         result.textContent = resultString
         enableDecimal();
+    } else if (scope === "runningDisplay") {
+        runningDisplayString ='0';
+        runningDisplay.textContent = runningDisplayString;
     }
 }
 
@@ -111,3 +144,58 @@ function del() {
         updateResult(newResultString);
     }
 }
+
+function convertEquationStringToArray(equation) {
+    let equationArray = [];
+    let num = '';
+    for (let x = 0; x < equation.length - 1; x ++) {
+        if (!isNaN(equation[x])) {
+            num += equation[x];
+        } else {
+            equationArray.push(Number(num));
+            equationArray.push(equation[x]);
+            num = '';
+        }
+    }
+    equationArray.push(Number(num));
+    return equationArray;
+}
+
+function evaluateEquation(equation){
+    for (let x = 0; x < equation.length; x++) {
+        if (equation[x] === '÷' || equation[x] === '×') {
+            equation.splice(x-1, 3, (operate(equation[x-1], equation[x+1], equation[x])));
+            x -= 1;
+        }
+    }
+    for (let x = 0; x < equation.length; x++) {
+        if (equation[x] === '+' || equation[x] === '-') {
+            equation.splice(x-1, 3, (operate(equation[x-1], equation[x+1], equation[x])));
+            x -= 1;
+        }
+    }
+    return(equation[0].toString());
+}
+
+function operate(num1, num2, operator){
+    switch (operator) {
+        case '÷':
+            return divide(num1, num2);
+            break;
+        case '×':
+            return multiply(num1, num2);
+            break;
+        case '+':
+            return add(num1, num2);
+            break;
+        case '-':
+            return subtract(num1,num2);
+            break;
+    }
+}
+
+// Calculation functions
+const divide = (a, b) => a/b;
+const multiply = (a, b) => a*b;
+const add = (a, b) => a+b;
+const subtract = (a, b) => a-b;
