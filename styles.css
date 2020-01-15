@@ -5,6 +5,7 @@ body {
 button {
     background-color: #DDD;
     font-size: 20px;
+    border-radius: 10px;
 }
 
 button:hover {
@@ -21,7 +22,7 @@ button:hover {
     border: 5px solid #999;
     background-color: #000;
     padding: 5px;
-    border-radius: 5px;
+    border-radius: 10px;
     width: 400px;;
     height: 500px;
     margin-left: auto;
@@ -38,13 +39,13 @@ button:hover {
     background-color: #EEE;
     border: 2px solid;
     text-align: right;
+    border-radius: 10px;
 }
 
 #runningdisplay {
     width: 97%;
     font-size: 18px;
     position: relative;
-    /*right: 15px;*/
     top: 15px;
     overflow: auto;
 }
@@ -54,7 +55,6 @@ button:hover {
     font-size: 26px;
     position: relative;
     top: 25px;
-    /*right: 15px;*/
     overflow: auto;
 }
 
