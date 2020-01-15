@@ -3,6 +3,8 @@ const buttons = document.querySelectorAll('button');
 for (let x=0; x < buttons.length; x ++) {
     buttons[x].addEventListener('click', buttonClick);
 }
+window.addEventListener('keydown', keyPress);
+
 let decimalEnabled = true;
 let lastButtonWasOperator = false;
 let equalsPressed = false;
@@ -34,8 +36,8 @@ function buttonClick(e) {
                 lastButtonWasOperator = false;
                 break;
             case 'equals':
-                updateRunningDisplay(this.id);
                 lastButtonWasOperator = false;
+                updateRunningDisplay(this.id);
                 updateResult(evaluateEquation(convertEquationStringToArray(runningDisplayString)));
                 equalsPressed = true;
                 break;
@@ -48,6 +50,49 @@ function buttonClick(e) {
                 break;
         }
     }
+}
+
+function keyPress(e) {
+    if (e.key === "Enter") e.preventDefault(); // Prevent the enter key from pressing the focused button
+    if (!isNaN(e.key)) {
+        updateResult(e.key);
+        lastButtonWasOperator = false;
+    } else {
+        switch (e.key) {
+            case 'Escape':
+                clear('all');
+                lastButtonWasOperator = false;
+                break;
+            case 'Backspace':
+                del();
+                lastButtonWasOperator = false;
+                break;
+            case '.':
+                if (decimalEnabled === true) {
+                    updateResult('.');
+                    this.removeEventListener('click', buttonClick);
+                    decimalEnabled = false;
+                    lastButtonWasOperator = false;
+                }
+                break;
+            case '=':
+            case 'Enter':
+                lastButtonWasOperator = false;
+                updateRunningDisplay('equals');
+                updateResult(evaluateEquation(convertEquationStringToArray(runningDisplayString)));
+                equalsPressed = true;
+                break;
+            case '/':
+            case '*':
+            case '-':
+            case '+':
+                const operators = {'/': 'divide', '*': 'multiply', '-': 'minus', '+': 'plus'};
+                updateRunningDisplay(operators[e.key]);
+                lastButtonWasOperator = true;
+                break;
+        }
+    }
+
 }
 
 function enableDecimal() {
@@ -81,7 +126,7 @@ function updateResult(chars) {
 }
 
 function updateRunningDisplay(operation) {
-    operators = {'divide': '÷', 'multiply': '×', 'plus': '+', 'minus': '-', 'equals':'='};
+    operators = {'divide': '÷', 'multiply': '×', 'plus': '+', 'minus': '-', 'equals': '='};
     if (resultString === 'Divide by 0 error!') {
         clear('all');
         equalsPressed = false;
@@ -149,7 +194,7 @@ function convertEquationStringToArray(equation) {
     let equationArray = [];
     let num = '';
     for (let x = 0; x < equation.length - 1; x ++) {
-        if (!isNaN(equation[x])) {
+        if (!isNaN(equation[x]) || equation[x] === '.') {
             num += equation[x];
         } else {
             equationArray.push(Number(num));
