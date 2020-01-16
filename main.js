@@ -127,24 +127,16 @@ function updateResult(chars) {
 
 function updateRunningDisplay(operation) {
     operators = {'divide': '÷', 'multiply': '×', 'plus': '+', 'minus': '-', 'equals': '='};
-    if (resultString === 'Divide by 0 error!') {
-        clear('all');
-        equalsPressed = false;
-        return;
-    }
     if (equalsPressed === true) {
-        let scientificNotation = false;
-        for (let x=0; x < resultString.length; x++) {
-            if (resultString[x] === 'e') {
-                scientificNotation = true;
-            }
-        }
-        if (scientificNotation === true) {
-            clear('all');   // Clears calculator when scientific notation is detected in previous result
+        let errorOrScientificNotation = false;
+        if (resultString.match(/e/g)) errorOrScientificNotation = true;
+
+        if (errorOrScientificNotation === true) {
+            clear('all');   // Clears calculator when scientific notation or divide by 0 error is detected in previous result
             equalsPressed = false;
             return;
         } else {
-            clear('runningDisplay'); // Clears only the running display if scientific notation isn't detected in previous result
+            clear('runningDisplay'); // Clears only the running display if scientific notation or divide by 0 error isn't detected in previous result
             equalsPressed = false;
         }
     }
